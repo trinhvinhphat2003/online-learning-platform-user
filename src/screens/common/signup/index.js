@@ -45,12 +45,17 @@ export default function SignupScreen() {
             });
 
             if (response.status === 200) {
-                Toast.show({
-                    type: 'success',
-                    text1: 'Signup Successful',
-                    text2: 'Welcome to Drawing Hub!',
-                });
-                navigation.navigate("Login")
+                if(response.data.success) {
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Signup Successful',
+                        text2: 'Welcome to Drawing Hub!',
+                    });
+                    navigation.navigate("Login")
+                } else {
+                    Alert.alert("Signup Error", "Dupplicate");
+                }
+                
                 // Navigate to another screen if needed
             }
         } catch (error) {

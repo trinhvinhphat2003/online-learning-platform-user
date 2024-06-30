@@ -1,10 +1,35 @@
-import React from 'react'
+import React, { useCallback, useContext } from 'react'
 import { Image, Text, TouchableOpacity, View } from 'react-native'
 import color from '../../themes/common/color'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { apiConfig } from '../../config/api-config'
+import { AuthContext } from '../../context/AuthContext'
+import axios from 'axios'
 
-export default function AuthorSection() {
+const BASE_URL = apiConfig.baseURL
+
+export default function AuthorSection({instructorId}) {
     const navigation = useNavigation()
+    const { userData, session } = useContext(AuthContext)
+
+    const fetchInstructorById = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/getCourse`, {
+                headers: {
+                    Authorization: `Bearer ${session.token}`,
+                },
+            });
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+            //fetchInstructorById()
+        }, [])
+    )
+
     return (
         <TouchableOpacity onPress={() => {
             navigation.navigate("TutorDetail")

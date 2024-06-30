@@ -4,12 +4,15 @@ import color from '../../themes/common/color'
 import { useNavigation } from '@react-navigation/native'
 import { mockFeedback } from '../../mock-data-support/feedback'
 
-export default function FeedbackSection() {
+export default function FeedbackSection({courseId, isEnrolled, isTrial}) {
     const navigation = useNavigation()
     return (
         <TouchableOpacity onPress={() => {
             navigation.navigate("FeedBack", {
-                feedbacks: mockFeedback
+                // feedbacks: mockFeedback
+                courseId: courseId,
+                isEnrolled: isEnrolled,
+                isTrial: isTrial
             })
         }}>
             <View style={{

@@ -16,7 +16,7 @@ const BASE_URL = apiConfig.baseURL
 export default function LoginScreen() {
     const { setIsLogin, setUserData, userData, setSession, session, login } = useContext(AuthContext)
     const navigation = useNavigation()
-    const [email, setEmail] = useState("trinhvinhphat123@gmail.com")
+    const [email, setEmail] = useState("trinhvinhphat1234567@gmail.com")
     const [password, setPassword] = useState("1122334455")
 
     const validateInput = () => {

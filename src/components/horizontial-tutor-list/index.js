@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { View, Image, StyleSheet, Text, FlatList, Dimensions, TouchableOpacity } from "react-native";
+import { View, Image, StyleSheet, Text, FlatList, Dimensions, TouchableOpacity, ActivityIndicator } from "react-native";
 import color from "../../themes/common/color";
 import { Ionicons } from "@expo/vector-icons";
 import CourseItem from "../course-item";
 import { useNavigation } from "@react-navigation/native";
 import { mockCourse } from "../../mock-data-support/course";
-import { ActivityIndicator } from "react-native-paper";
+import { mockTutos } from "../../mock-data-support/tutors";
+import TutorCard from "../tutor-card";
 
-export default function VideoCourseList({ subHeadingColor, isPrimary, title, courses, navigateTo, loading }) {
+export default function HorizontialTutorList({ subHeadingColor, isPrimary, title, tutors, navigateTo, loading }) {
 
     const navigation = useNavigation()
     return (
@@ -24,16 +25,16 @@ export default function VideoCourseList({ subHeadingColor, isPrimary, title, cou
                     fontSize: 24,
                     color: subHeadingColor
                 }}>{title}</Text>
-                <TouchableOpacity
-                    onPress={() => {
-                        navigation.navigate(navigateTo)
-                    }}
-                    style={{
-                        width: 80,
-                        backgroundColor: isPrimary ? color.PRIMARY : "white",
-                        padding: 10,
-                        borderRadius: 30
-                    }}>
+                <TouchableOpacity 
+                onPress={() => {
+                    navigation.navigate(navigateTo)
+                }}
+                style={{
+                    width: 80,
+                    backgroundColor: isPrimary ? color.PRIMARY : "white",
+                    padding: 10,
+                    borderRadius: 30
+                }}>
                     <Text style={{
                         fontFamily: "outfit-bold",
                         color: isPrimary ? "white" : "black"
@@ -42,11 +43,12 @@ export default function VideoCourseList({ subHeadingColor, isPrimary, title, cou
                     </Text>
                 </TouchableOpacity>
             </View>
+
             {
                 loading ?
                     (
                         <View style={{
-                            height: 240,
+                            height: 230,
                             width: "100%"
                         }}>
                             <ActivityIndicator size="large" color={color.BLACK} style={{ marginTop: 20, alignSelf: "center" }} />
@@ -56,22 +58,16 @@ export default function VideoCourseList({ subHeadingColor, isPrimary, title, cou
                     (
                         <FlatList
                             contentContainerStyle={{ paddingTop: 10, paddingBottom: 10, paddingLeft: 3, paddingRight: 3 }}
-                            data={courses}
+                            data={tutors}
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
                             renderItem={({ item }) => (
-                                <TouchableOpacity style={{
-                                    marginLeft: 10,
-                                    marginRight: 10
-                                }} onPress={() => {
-                                    navigation.navigate("CourseDetail",
-                                        {
-                                            course: item
-                                        }
-                                    );
+                                <View style={{
+                                    paddingHorizontal: 10
                                 }}>
-                                    <CourseItem item={item} />
-                                </TouchableOpacity>
+                                    <TutorCard tutor={{item: item}}/>
+                                </View>
+                                
                             )}
                         />
                     )

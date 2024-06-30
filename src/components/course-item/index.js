@@ -12,7 +12,7 @@ export default function CourseItem({ item }) {
             elevation: 3
         }}>
             <Image source={{
-                uri: item.image
+                uri: item.image_url
             }} style={styles.itemImage} />
             <View style={{
                 padding: 7,
@@ -39,7 +39,7 @@ export default function CourseItem({ item }) {
                         <Ionicons name="book-outline" size={18} color={color.BLACK} />
                         <Text style={{
                             fontFamily: "outfit"
-                        }}>{item.lessonCount} Lessions</Text>
+                        }}>{item.chapters.length} Chapter</Text>
                     </View>
 
                     <View style={{
@@ -54,9 +54,19 @@ export default function CourseItem({ item }) {
                             fontFamily: "outfit",
                         }}>{item.hour} Hours</Text>
                     </View>
-
                 </View>
             </View>
+            {item.is_trial &&
+                <View>
+                    <Text style={{
+                        fontFamily: "outfit-bold",
+                        fontSize: 20,
+                        color: "green"
+                    }}>
+                        TRIAL
+                    </Text>
+                </View>
+            }
 
         </View>
     )

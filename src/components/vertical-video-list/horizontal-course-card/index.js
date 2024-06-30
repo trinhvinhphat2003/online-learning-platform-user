@@ -1,12 +1,34 @@
-import React from 'react'
-import { ImageBackground, Text, TouchableOpacity, View } from 'react-native'
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useCallback, useContext, useState } from 'react'
+import { Alert, ImageBackground, Text, TouchableOpacity, View } from 'react-native'
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import color from '../../../themes/common/color';
 import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { apiConfig } from '../../../config/api-config';
+import { AuthContext } from '../../../context/AuthContext';
 
-export default function HorizontalCourseCard({ containerStyle, course }) {
+const BASE_URL = apiConfig.baseURL
+
+export default function HorizontalCourseCard({ containerStyle, course, enrolledCourses }) {
     const navigation = useNavigation()
+    //const [isEnrolled, setIsEnrolled] = useState(course.isEnrolled)
+
+    async function handleIsCourseEnrolled() {
+        //console.log(JSON.stringify(enrolledCourses, undefined, 4));
+        for (const item of enrolledCourses) {
+            if (course.course_id === item.course_id) {
+                setIsEnrolled(true)
+            }
+        }
+    }
+
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         handleIsCourseEnrolled()
+    //     }, [])
+    // )
+
     return (
         <TouchableOpacity style={{
             display: "flex",
@@ -23,7 +45,7 @@ export default function HorizontalCourseCard({ containerStyle, course }) {
                 }
             );
         }}>
-            <ImageBackground source={{ uri: course.image }} resizeMode='cover' style={{
+            <ImageBackground source={{ uri: course.image_url }} resizeMode='cover' style={{
                 width: 130,
                 height: 130
             }} imageStyle={{
@@ -49,7 +71,7 @@ export default function HorizontalCourseCard({ containerStyle, course }) {
                     justifyContent: "space-between",
                     alignItems: "center"
                 }}>
-                    
+
                     <View style={{
                         display: "flex",
                         flexDirection: "row",
@@ -62,7 +84,7 @@ export default function HorizontalCourseCard({ containerStyle, course }) {
                             fontFamily: "outfit-medium",
 
                         }}>
-                            2h 30m
+                            {course.hour} Hours
                         </Text>
                     </View>
                     <View style={{
@@ -77,7 +99,47 @@ export default function HorizontalCourseCard({ containerStyle, course }) {
                             fontFamily: "outfit-medium",
 
                         }}>
-                            2 Lesson
+                            {course.chapters.length} {course.chapters.length > 1 ? " Chapters" : " Chapter"}
+                        </Text>
+                    </View>
+
+                </View>
+
+                <View style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginTop: 10,
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                }}>
+
+                    <View style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 5
+                    }}>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: "outfit-medium",
+
+                        }}>
+                            By Trinh Vinh Phat
+                        </Text>
+                    </View>
+                    <View style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 5
+                    }}>
+                        <Ionicons name={"cellular-outline"} size={18} color={color.BLACK} />
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: "outfit-medium",
+
+                        }}>
+                            {course.category}
                         </Text>
                     </View>
 
@@ -87,24 +149,27 @@ export default function HorizontalCourseCard({ containerStyle, course }) {
                     flexDirection: 'row',
                     alignItems: 'center',
                     marginTop: 10,
-                    justifyContent: "space-between"
+                    justifyContent: "flex-start"
                 }}>
-                    <Text style={{
-                        fontSize: 25,
-                        fontFamily: "outfit-bold",
-                        color: color.PRIMARY
-                    }}>
-                        75.000
-                    </Text>
-                    <Text style={{
-                        fontSize: 14,
-                        fontFamily: "outfit-medium",
+                    {course.is_trial ?
+                        <Text style={{
+                            fontFamily: "outfit-bold",
+                            fontSize: 20,
+                            color: "green"
+                        }}>
+                            TRIAL
+                        </Text>
+                        :
+                        <Text style={{
+                            fontSize: 25,
+                            fontFamily: "outfit-bold",
+                            color: course.isEnrolled ? "green" : color.PRIMARY
+                        }}>
+                            {course.isEnrolled ? "ENROLLED" : course.price}
+                        </Text>
+                    }
 
-                    }}>
-                        By Trinh Vinh Phat
-                    </Text>
-                    
-            </View>
+                </View>
             </View>
         </TouchableOpacity>
     )

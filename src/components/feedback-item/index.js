@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Image, Text, TouchableOpacity, View } from 'react-native'
-import { SimpleLineIcons } from '@expo/vector-icons';
+import { Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { FontAwesome } from 'react-native-vector-icons';
+import { AuthContext } from '../../context/AuthContext';
 
 function timeDifferent(milliseconds) {
     const now = new Date();
@@ -55,6 +56,7 @@ const renderStars = (rating) => {
 };
 
 export default function FeedbackItem({ feedback }) {
+    const { userData, session } = useContext(AuthContext)
     return (
         <View style={{
             width: "90%",
@@ -73,7 +75,7 @@ export default function FeedbackItem({ feedback }) {
                     alignItems: "center",
 
                 }}>
-                    <Image source={{ uri: "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg" }} style={{
+                    <Image source={{ uri: feedback.item?.userData?.image_url ? feedback.item.userData.image_url : "https://d1hjkbq40fs2x4.cloudfront.net/2016-01-31/files/1045-2.jpg" }} style={{
                         width: 40,
                         height: 40,
                         borderRadius: 99
@@ -83,16 +85,18 @@ export default function FeedbackItem({ feedback }) {
                     }}>
                         <Text style={{
                             fontSize: 17,
-                            fontFamily: "outfit-medium"
+                            fontFamily: "outfit-medium",
+                            color: feedback.item.user_id === userData.user_id ? "red" : "black"
                         }}>
-                            {feedback.item.userName}
+                            {/* {feedback.item.userName } */}
+                            {feedback.item?.userData?.user_name ? feedback.item.userData.user_name : "user"} {feedback.item.user_id === userData.user_id && "(you)"}
                         </Text>
                         <Text style={{
                             fontSize: 12,
                             fontFamily: "outfit-medium",
                             color: "gray"
                         }}>
-                            {timeDifferent(new Date('2024-06-07T12:00:00').getTime())}
+                            {timeDifferent(feedback.item.comment_at)}
                         </Text>
                     </View>
                 </View>
@@ -114,7 +118,7 @@ export default function FeedbackItem({ feedback }) {
                 fontFamily: "outfit-bold",
                 marginTop: 10
             }}>
-                {renderStars(feedback.item.rating)}
+                {renderStars(feedback.item.rate)}
             </Text>
 
         </View>

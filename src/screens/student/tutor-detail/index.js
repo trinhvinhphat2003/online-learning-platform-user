@@ -2,14 +2,15 @@ import React, { useContext, useState } from 'react'
 import { ScrollView, TouchableOpacity, View, Image } from 'react-native'
 import { Text } from 'react-native'
 import TopBackSection from '../../../components/top-back-section'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import color from '../../../themes/common/color'
 import StudentProfileCourse from '../../../components/student-profile-course'
 import { mockCourse } from '../../../mock-data-support/course'
 
 export default function TutorDetailScreen() {
     const navigation = useNavigation()
-
+    const {tutor} = useRoute().params;
+    console.log(JSON.stringify(tutor, undefined, 4))
     const [videoList, setVideoList] = useState(mockCourse)
     const [collectionSelected, setCollectionSelected] = useState(1)
 
@@ -36,7 +37,7 @@ export default function TutorDetailScreen() {
 
                 <View>
                     <Image
-                        source={require('../../../../assets/google_logo.jpg')}
+                        source={{uri: tutor.image_url}}
                         style={{
                             height: 100,
                             width: 100,
@@ -51,16 +52,16 @@ export default function TutorDetailScreen() {
                         color: "#044244",
                         alignSelf: "center"
                     }}>
-                        Ksenia Bator
+                        {tutor.user_name}
                     </Text>
-                    <Text style={{
+                    {/* <Text style={{
                         fontFamily: "outfit-medium",
                         fontSize: 16,
                         color: "#9ca1a2",
                         alignSelf: "center"
                     }}>
                         Kiev, Ukraine
-                    </Text>
+                    </Text> */}
                 </View>
 
                 <View style={{

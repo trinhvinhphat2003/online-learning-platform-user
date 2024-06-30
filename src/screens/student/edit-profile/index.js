@@ -8,19 +8,21 @@ import {
   Modal,
   StyleSheet,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 import { useNavigation } from '@react-navigation/native';
 import color from "../../../themes/common/color";
 import TopBackSection from "../../../components/top-back-section";
+import { AuthContext } from "../../../context/AuthContext";
 
 export default function EditProfile() {
+  const { userData } = useContext(AuthContext)
   const navigation = useNavigation()
-  const [selectedImage, setSelectedImage] = useState("https://d1hjkbq40fs2x4.cloudfront.net/2016-01-31/files/1045-2.jpg");
-  const [name, setName] = useState("Melissa Peters");
-  const [email, setEmail] = useState("metperters@gmail.com");
+  const [selectedImage, setSelectedImage] = useState(userData.image_url);
+  const [name, setName] = useState(userData.user_name);
+  const [email, setEmail] = useState(userData.email);
   const [password, setPassword] = useState("randompassword");
   const [country, setCountry] = useState("Nigeria");
 

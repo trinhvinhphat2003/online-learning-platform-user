@@ -12,7 +12,7 @@ import { mockCourse } from '../../../mock-data-support/course';
 export default function ProfileScreen() {
     const [videoList, setVideoList] = useState(mockCourse)
     const navigation = useNavigation()
-    const { setIsLogin } = useContext(AuthContext)
+    const { setIsLogin, userData } = useContext(AuthContext)
 
     const [collectionSelected, setCollectionSelected] = useState(true)
     const [modalVisible, setModalVisible] = useState(false);
@@ -69,7 +69,7 @@ export default function ProfileScreen() {
                 </View>
 
                 <Image
-                    source={require('../../../../assets/google_logo.jpg')}
+                    source={{uri: userData.image_url}}
                     style={{
                         height: 100,
                         width: 100,
@@ -84,16 +84,16 @@ export default function ProfileScreen() {
                     color: "#044244",
                     alignSelf: "center"
                 }}>
-                    Ksenia Bator
+                    {userData.user_name}
                 </Text>
-                <Text style={{
+                {/* <Text style={{
                     fontFamily: "outfit-medium",
                     fontSize: 16,
                     color: "#9ca1a2",
                     alignSelf: "center"
                 }}>
                     Kiev, Ukraine
-                </Text>
+                </Text> */}
 
 
                 <View style={{

@@ -14,14 +14,16 @@ export default function TutorCard({ tutor }) {
             borderRadius: 10,
             elevation: 5
         }} onPress={() => {
-            navigation.navigate("TutorDetail")
+            navigation.navigate("TutorDetail", {
+                tutor: tutor.item
+            })
         }}>
             <View style={{
                 width: "100%",
                 alignItems: "center",
                 paddingVertical: 10
             }}>
-                <Image source={{ uri: tutor.item.avatar }} style={{
+                <Image source={{ uri: tutor.item.image_url }} style={{
                     width: 80,
                     height: 80,
                     borderRadius: 99
@@ -36,7 +38,7 @@ export default function TutorCard({ tutor }) {
                     color: "white",
                     fontSize: 25
                 }} >
-                    {tutor.item.fullName}
+                    {tutor.item.user_name}
                 </Text>
             </View>
             <View style={{
@@ -52,7 +54,7 @@ export default function TutorCard({ tutor }) {
                     color: "white",
                     fontSize: 16
                 }} >
-                    5 Lessons
+                    {tutor.item.courses.length} Lesson{tutor.item.courses.length > 1 ? "s" : ""}
                 </Text>
                 <View style={{
                     padding: 10,
