@@ -275,6 +275,7 @@ export default function ProfileScreen() {
                         {courses.map((item, index) => (
                             <StudentProfileCourse
                             index={index}
+                            key={index}
                             onPress={() => {
                                 navigation.push("CourseDetail",
                                     {

@@ -1,20 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, Dimensions } from "react-native";
-import Icon  from "react-native-vector-icons/MaterialCommunityIcons";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import color from "../../themes/common/color";
 import { apiConfig } from "../../config/api-config";
+import { Entypo } from '@expo/vector-icons';
+import { TouchableOpacity } from "react-native";
 
 const TextInputContainer = (props) => {
-    const { name, icon, placeholder, value, setValue} = props;
-    return(
+    const { name, icon, placeholder, value, setValue } = props;
+    const [isHidePass, setIsHidePass] = useState(true)
+    return (
         <View style={styles.container}>
             <View style={styles.iconContainer}>
                 <Icon name={icon} size={30} color={color.PRIMARY} />
             </View>
-            <View>
-                <Text style={styles.title}>{name}</Text>
-                <TextInput secureTextEntry={name === "Password" ? true : false} onChangeText={(text) => setValue(text)} value={value} style={styles.input} placeholder={placeholder} />
-            </View>
+            {
+                name === "Password" ?
+                    (
+                        <View style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            width: 330
+                        }}>
+                            <View>
+                                <Text style={styles.title}>{name}</Text>
+                                <TextInput secureTextEntry={isHidePass} onChangeText={(text) => setValue(text)} value={value} style={styles.input} placeholder={placeholder} />
+                            </View>
+                            <TouchableOpacity onPress={() => setIsHidePass(!isHidePass)} style={{
+                                marginRight: 5
+                            }}>
+                                <Entypo name={isHidePass ? "eye-with-line" : "eye"} size={24} color="black" />
+                            </TouchableOpacity>
+                        </View>
+
+                    )
+                    :
+                    (
+                        <View>
+                            <Text style={styles.title}>{name}</Text>
+                            <TextInput onChangeText={(text) => setValue(text)} value={value} style={styles.input} placeholder={placeholder} />
+                        </View>
+                    )
+            }
+
         </View>
     )
 }

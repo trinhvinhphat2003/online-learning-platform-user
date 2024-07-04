@@ -19,6 +19,7 @@ import { AuthContext } from "../../../context/AuthContext";
 import axios from "axios";
 import { apiConfig } from "../../../config/api-config";
 import Toast from "react-native-toast-message";
+import ChangePasswordModal from "../../../components/change-password-modal";
 
 const BASE_URL = apiConfig.baseURL
 
@@ -40,6 +41,7 @@ export default function EditProfile() {
   );
   const [selectedStartDate, setSelectedStartDate] = useState(userData.date_of_birth ? userData.date_of_birth : "2023-12-12");
   const [startedDate, setStartedDate] = useState(userData.date_of_birth);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleSaveChange = async () => {
     const updateData = {
@@ -68,11 +70,11 @@ export default function EditProfile() {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         const data = response.data;
         console.log(JSON.stringify(data, undefined, 4))
-        if(data.success) {
-          updateData.image_url=baseImageUrl + data.filename
+        if (data.success) {
+          updateData.image_url = baseImageUrl + data.filename
         }
       } catch (error) {
         console.error('Error uploading image:', error);
@@ -80,15 +82,15 @@ export default function EditProfile() {
     }
 
     try {
-      const response = await axios.put(`${BASE_URL}/api/user/updateCustomerProfile`, 
+      const response = await axios.put(`${BASE_URL}/api/user/updateCustomerProfile`,
         {
           userData: updateData
         },
         {
           headers: {
-              Authorization: `Bearer ${session.token}`,
+            Authorization: `Bearer ${session.token}`,
           },
-      });
+        });
 
       console.log(JSON.stringify(response.data, undefined, 4))
 
@@ -103,11 +105,11 @@ export default function EditProfile() {
           type: 'success',
           text1: 'Success',
           text2: 'Edit profile successfully!',
-      });
+        });
       }
-  } catch (error) {
+    } catch (error) {
       console.error("Error fetching data:", error);
-  }
+    }
 
 
 
@@ -308,7 +310,7 @@ export default function EditProfile() {
             <Text style={{ fontFamily: "outfit-bold" }}>Password</Text>
             <View
               style={{
-                height: 44,
+                minHeight: 44,
                 width: "100%",
                 borderColor: color.secondaryGray,
                 borderWidth: 1,
@@ -316,6 +318,10 @@ export default function EditProfile() {
                 marginVertical: 6,
                 justifyContent: "center",
                 paddingLeft: 8,
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
               }}
             >
               <TextInput
@@ -325,7 +331,29 @@ export default function EditProfile() {
                 secureTextEntry
                 style={{ fontFamily: "outfit-medium" }}
               />
+              <TouchableOpacity
+                onPress={() => setModalVisible(true)}
+                style={{
+                  backgroundColor: color.PRIMARY,
+                  padding: 10,
+                  borderRadius: 4,
+                  marginRight: 1
+                }}
+              >
+                <Text style={{
+                  fontFamily: "outfit-bold",
+                  color: "white"
+                }}>
+                  Change Password
+                </Text>
+              </TouchableOpacity>
             </View>
+            <ChangePasswordModal
+              visible={modalVisible}
+              onClose={() => setModalVisible(false)}
+              // onEditProfile={handleEditProfile}
+              // onLogOut={handleLogOut}
+            />
           </View>
 
           <View
