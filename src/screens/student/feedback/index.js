@@ -25,7 +25,7 @@ export default function FeedbackScreen() {
 
     const handleCommentSubmit = async () => {
         try {
-            const response = await axios.post(`${BASE_URL}/api/addComment`, {
+            const response = await axios.post(`${BASE_URL}/api/user/addComment`, {
                 comment: {
                     course_id: params.courseId,
                     comment,
@@ -54,7 +54,7 @@ export default function FeedbackScreen() {
     const fetchFeedbackByCourseId = async () => {
         setLoading(true); // Bắt đầu loading
         try {
-            const response = await axios.get(`${BASE_URL}/api/getCommentByCourseId`, {
+            const response = await axios.get(`${BASE_URL}/api/user/getCommentByCourseId`, {
                 headers: {
                     Authorization: `Bearer ${session.token}`,
                 },
@@ -116,9 +116,9 @@ export default function FeedbackScreen() {
 
             {/* input comement section */}
             {
-                disableFeedback || (!params.isEnrolled && !params.isTrial)?
+                disableFeedback || !params.isEnrolled?
                 (
-                    !params.isEnrolled && !params.isTrial ?
+                    !params.isEnrolled ?
                     (
                         <View style={{
                             width: "100%",

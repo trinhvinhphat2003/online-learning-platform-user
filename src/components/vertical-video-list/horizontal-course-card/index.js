@@ -124,7 +124,7 @@ export default function HorizontalCourseCard({ containerStyle, course, enrolledC
                             fontFamily: "outfit-medium",
 
                         }}>
-                            By Trinh Vinh Phat
+                            By {course.instructor.user_name}
                         </Text>
                     </View>
                     <View style={{
@@ -151,7 +151,7 @@ export default function HorizontalCourseCard({ containerStyle, course, enrolledC
                     marginTop: 10,
                     justifyContent: "flex-start"
                 }}>
-                    {course.is_trial ?
+                    {course.is_trial && !course.isEnrolled ?
                         <Text style={{
                             fontFamily: "outfit-bold",
                             fontSize: 20,
@@ -165,7 +165,7 @@ export default function HorizontalCourseCard({ containerStyle, course, enrolledC
                             fontFamily: "outfit-bold",
                             color: course.isEnrolled ? "green" : color.PRIMARY
                         }}>
-                            {course.isEnrolled ? "ENROLLED" : course.price}
+                            {course.isEnrolled ? "ENROLLED" : formatCurrency(course.price)}
                         </Text>
                     }
 
@@ -173,4 +173,11 @@ export default function HorizontalCourseCard({ containerStyle, course, enrolledC
             </View>
         </TouchableOpacity>
     )
+}
+
+function formatCurrency(amount) {
+    // Chuyển đổi số nguyên thành chuỗi và định dạng lại với dấu chấm
+    const formattedAmount = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // Thêm đơn vị tiền tệ "VND" vào cuối chuỗi
+    return `${formattedAmount} VND`;
 }

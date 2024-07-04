@@ -27,16 +27,40 @@ export default function CourseDetailScreen() {
     const [webViewVisible, setWebViewVisible] = useState(false);
     const [sdkUrl, setSdkUrl] = useState("https://www.google.com/");
 
-    const handleSdkReturn = (url) => {
+    const handleSdkReturn = async (url) => {
         if (url.includes('vnp_TransactionStatus=00')) {
             console.log('Transaction successful');
             setWebViewVisible(false);
             //ToastAndroid.show('Quay lại từ SDK thành công', ToastAndroid.SHORT);
-            Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Enrolled successfully!',
-            });
+            try {
+                const response = await axios.post(`${BASE_URL}/api/user/addEnroll`,
+                    {
+                        enrollment: {
+                            course_id: course.course_id,
+                            enrolled_at: Date.now(),
+                            price: course.price,
+                            instructor_id: course.instructor_id
+                        }
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${session.token}`,
+                        }
+                    }
+                );
+                if (response.data.success) {
+                    setIsEnrolled(!isEnrolled)
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Success',
+                        text2: 'Enrolled successfully!',
+                    });
+                    //console.log(JSON.stringify(response.data, undefined, 4))
+                }
+            } catch (error) {
+                Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
+                console.log(JSON.stringify(error, undefined, 4))
+            }
         } else if (url.includes('vnp_TransactionStatus=02')) {
             Alert.alert("Cancel transaction", "You have cancel transaction");
             console.log('Transaction Cancel');
@@ -47,7 +71,7 @@ export default function CourseDetailScreen() {
     const fetchCompletedChapter = async () => {
         setLoading(true); // Bắt đầu loading
         try {
-            const response = await axios.get(`${BASE_URL}/api/getCompleteChapter`, {
+            const response = await axios.get(`${BASE_URL}/api/user/getCompleteChapter`, {
                 headers: {
                     Authorization: `Bearer ${session.token}`,
                 },
@@ -86,7 +110,7 @@ export default function CourseDetailScreen() {
                 }
             }
             setStandardizedChapters(standardizedChapters)
-            console.log(JSON.stringify(standardizedChapters, undefined, 4));
+            //console.log(JSON.stringify(standardizedChapters, undefined, 4));
         } catch (error) {
             Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
             console.log(JSON.stringify(error, undefined, 4))
@@ -97,7 +121,7 @@ export default function CourseDetailScreen() {
 
     async function handleIsCourseEnrolled() {
         try {
-            const response = await axios.get(`${BASE_URL}/api/getEnroll`, {
+            const response = await axios.get(`${BASE_URL}/api/user/getEnroll`, {
                 headers: {
                     Authorization: `Bearer ${session.token}`,
                 }
@@ -173,7 +197,7 @@ export default function CourseDetailScreen() {
                     }}>
                         <DetailSection course={courseDetail} isEnrolled={isEnrolled} setIsEnrolled={setIsEnrolled} setWebViewVisible={setWebViewVisible} setSdkUrl={setSdkUrl} />
                         {
-                            !isInstructor && <AuthorSection instructorId={courseDetail.instructor_id} />
+                            !isInstructor && <AuthorSection instructor={courseDetail.instructor} />
                         }
 
                         <FeedbackSection courseId={courseDetail.course_id} isEnrolled={isEnrolled} isTrial={course.is_trial} />

@@ -1,22 +1,127 @@
-import React, { useContext, useState } from 'react'
-import { ScrollView, TouchableOpacity, View, Image } from 'react-native'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { ScrollView, TouchableOpacity, View, Image, ActivityIndicator } from 'react-native'
 import { Text } from 'react-native'
 import TopBackSection from '../../../components/top-back-section'
-import { useNavigation, useRoute } from '@react-navigation/native'
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
 import color from '../../../themes/common/color'
 import StudentProfileCourse from '../../../components/student-profile-course'
 import { mockCourse } from '../../../mock-data-support/course'
+import TutorProfileCourse from '../../../components/tutor-profile-course'
+import { apiConfig } from '../../../config/api-config'
+import { AuthContext } from '../../../context/AuthContext'
+import axios from 'axios'
+
+const BASE_URL = apiConfig.baseURL
 
 export default function TutorDetailScreen() {
+
+    const { userData, session } = useContext(AuthContext)
     const navigation = useNavigation()
     const {tutor} = useRoute().params;
-    console.log(JSON.stringify(tutor, undefined, 4))
-    const [videoList, setVideoList] = useState(mockCourse)
+    const [courses, setCourses] = useState(tutor.courses)
+    //console.log(JSON.stringify(tutor, undefined, 4))
+    //console.log(JSON.stringify(courses, undefined, 4))
+    //const [videoList, setVideoList] = useState(mockCourse)
     const [collectionSelected, setCollectionSelected] = useState(1)
+    const [courseLoading, setCourseLoading] = useState(false)
+    const [enrollData, setEnrollData] = useState([])
+
+    useEffect(() => {
+        let standardlizedData = []
+        for (const courseRes of tutor.courses) {
+            let check = false;
+            for (const enroll of enrollData) {
+                if (courseRes.course_id === enroll.course_id) {
+                    standardlizedData.push({
+                        ...courseRes,
+                        isEnrolled: true
+                    })
+                    check = true;
+                    break;
+                }
+            }
+            if (check === false) {
+                standardlizedData.push({
+                    ...courseRes,
+                    isEnrolled: false
+                })
+            }
+        }
+        //console.log(JSON.stringify(standardlizedData, undefined, 4))
+        if(collectionSelected === 1) {
+            setCourses(standardlizedData.filter((item) => item.category === "basic"))
+        }
+        if(collectionSelected === 2) {
+            setCourses(standardlizedData.filter((item) => item.category === "intermediate"))
+        }
+        if(collectionSelected === 3) {
+            setCourses(standardlizedData.filter((item) => item.category === "advance"))
+        }
+    }, [collectionSelected, enrollData])
+
+    useFocusEffect(
+        useCallback(() => {
+            //console.log(collectionSelected)
+            const fetchData = async () => {
+                setCourseLoading(true); // Bắt đầu loading
+                try {
+                    const response2 = await axios.get(`${BASE_URL}/api/user/getEnroll`, {
+                        headers: {
+                            Authorization: `Bearer ${session.token}`,
+                        }
+                    });
+
+                    let standardlizedData = []
+
+                    if (response2.data.success) {
+                        setEnrollData(response2?.data?.enrollData)
+                        // for (const courseRes of tutor.courses) {
+                        //     let check = false;
+                        //     for (const enroll of response2?.data?.enrollData) {
+                        //         if (courseRes.course_id === enroll.course_id) {
+                        //             standardlizedData.push({
+                        //                 ...courseRes,
+                        //                 isEnrolled: true
+                        //             })
+                        //             check = true;
+                        //             break;
+                        //         }
+                        //     }
+                        //     if (check === false) {
+                        //         standardlizedData.push({
+                        //             ...courseRes,
+                        //             isEnrolled: false
+                        //         })
+                        //     }
+                        // }
+                        // //console.log(JSON.stringify(standardlizedData, undefined, 4))
+                        // console.log(collectionSelected)
+                        // if(collectionSelected === 1) {
+                        //     setCourses(standardlizedData.filter((item) => item.category === "basic"))
+                        // }
+                        // if(collectionSelected === 2) {
+                        //     setCourses(standardlizedData.filter((item) => item.category === "intermediate"))
+                        // }
+                        // if(collectionSelected === 3) {
+                        //     setCourses(standardlizedData.filter((item) => item.category === "advance"))
+                        // }
+                        //setCourses(standardlizedData)
+                    }
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                } finally {
+                    setCourseLoading(false); // Kết thúc loading
+                }
+            };
+
+            fetchData();
+        }, [])
+    )
 
 
-    onTabPressed = (value) => {
-        setCollectionSelected(value)
+    onTabPressed = async (value) => {
+        console.log("value: " + value)
+        await setCollectionSelected(value)
     }
     return (
         <View style={{
@@ -84,7 +189,7 @@ export default function TutorDetailScreen() {
                             fontSize: 15,
                             color: "#044244",
                             alignSelf: "center"
-                        }}>2,107</Text>
+                        }}>{tutor.courses ? tutor.courses.length : 0}</Text>
                         
                     </View>
 
@@ -107,7 +212,7 @@ export default function TutorDetailScreen() {
                 >
                     <Text style={{
                         fontFamily: "outfit-bold",
-                        color: collectionSelected ? "#FFF" : "#9ca1a2"
+                        color: collectionSelected === 1 ? "#FFF" : "#9ca1a2"
                     }}>BASIC</Text>
                 </TouchableOpacity>
 
@@ -122,7 +227,7 @@ export default function TutorDetailScreen() {
                 >
                     <Text style={{
                         fontFamily: "outfit-bold",
-                        color: collectionSelected ? "#9ca1a2" : "#FFF"
+                        color: collectionSelected === 2 ? "#FFF" : "#9ca1a2"
                     }}>INTERMEDIATE</Text>
                 </TouchableOpacity>
 
@@ -137,37 +242,46 @@ export default function TutorDetailScreen() {
                 >
                     <Text style={{
                         fontFamily: "outfit-bold",
-                        color: collectionSelected ? "#9ca1a2" : "#FFF"
-                    }}>EXPERT</Text>
+                        color: collectionSelected === 3 ? "#FFF" : "#9ca1a2"
+                    }}>ADVANCE</Text>
                 </TouchableOpacity>
             </View>
-
-
-            <ScrollView style={{
-                display: "flex",
-                flexDirection: "column",
-                marginTop: 15,
-                marginBottom: 15,
-                paddingLeft: 3,
-                paddingRight: 3
-            }}>
-                {videoList.map((item, index) => (
-                    <StudentProfileCourse
-                        index={index}
-                        onPress={() => {
-                            navigation.navigate("CourseDetail",
-                                {
-                                    course: item
-                                }
-                            )
-                        }}
-                        img={item.image}
-                        title={item.title}
-                        bg="#fff"
-                    />
-                ))}
-
-            </ScrollView>
+            {
+                courseLoading ?
+                (
+                    <ActivityIndicator size="large" color={color.BLACK} style={{ marginTop: 20, alignSelf: "center" }} />
+                )
+                :
+                (
+                    <ScrollView style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        marginTop: 15,
+                        marginBottom: 15,
+                        paddingLeft: 3,
+                        paddingRight: 3
+                    }}>
+                        {courses.map((item, index) => (
+                            <TutorProfileCourse
+                                index={index}
+                                onPress={() => {
+                                    navigation.push("CourseDetail",
+                                        {
+                                            course: item,
+                                            isInstructor: true
+                                        }
+                                    )
+                                }}
+                                img={item.image_url}
+                                title={item.title}
+                                bg="#fff"
+                                course={item}
+                            />
+                        ))}
+        
+                    </ScrollView>
+                )
+            }
         </View>
     )
 }

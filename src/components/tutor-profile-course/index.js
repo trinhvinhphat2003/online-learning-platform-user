@@ -1,9 +1,10 @@
 import React from 'react'
 import { Text, TouchableOpacity, View, Image } from 'react-native'
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import color from '../../themes/common/color';
 
-export default function StudentProfileCourse({ img, title, bg, onPress, course, index }) {
+
+export default function TutorProfileCourse({ img, title, bg, onPress, course, index }) {
 
     return (
         <TouchableOpacity
@@ -49,53 +50,40 @@ export default function StudentProfileCourse({ img, title, bg, onPress, course, 
                     }}>
                         {course.hour} hours, {course.chapters.length} chapters, {course.category}
                     </Text>
-                    <View style={{
-                        width: "100%",
-                        height: 10,
-                        backgroundColor: "white",
-                        borderRadius: 99,
-                        borderWidth: 3,
-                        borderColor: color.PRIMARY,
-                        marginLeft: 10
-                    }}>
-                        <View style={{
-                            width: calculatePercentage(course?.courseCompleted?.length, course?.chapters?.length),
-                            height: "100%",
-                            backgroundColor: color.GREEN
-                        }}>
-
-                        </View>
-                    </View>
                 </View>
             </View>
 
             {
-                !course.isEnrolled ?
+                !course.isEnrolled && !course.is_trial ?
+                (
+                    <Feather name="play-circle" size={45} color={color.PRIMARY} />
+                )
+                :
+                (
+                    course.is_trial && !course.isEnrolled ?
                     (
-                        <Feather name="play-circle" size={45} color={color.PRIMARY} />
+                        <Text style={{
+                            fontFamily: "outfit-bold",
+                            fontSize: 20,
+                            color: "green"
+                        }}>TRIAL</Text>
                     )
                     :
                     (
                         course.isEnrolled ?
-                            (
-                                calculatePercentage(course?.courseCompleted?.length, course?.chapters?.length) === "100%" ?
-                                    (
-                                        <Ionicons name="checkmark-circle" size={45} color={color.GREEN} />
-                                    )
-                                    :
-                                    (
-                                        <Feather name="play-circle" size={45} color={color.GREEN} />
-                                    )
-
-                            )
-                            :
-                            (
-                                <Feather name="play-circle" size={45} color={color.PRIMARY} />
-                            )
-
-
+                        (
+                            <Feather name="play-circle" size={45} color={color.GREEN} />
+                        )
+                        :
+                        (
+                            <Feather name="play-circle" size={45} color={color.PRIMARY} />
+                        )
                     )
+                    
+                )
             }
+            
+
         </TouchableOpacity>
     )
 }
@@ -105,14 +93,4 @@ function formatCurrency(amount) {
     const formattedAmount = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     // Thêm đơn vị tiền tệ "VND" vào cuối chuỗi
     return `${formattedAmount} VND`;
-}
-
-function calculatePercentage(part, total) {
-    if (total === 0) {
-        return '0%'; // Tránh chia cho 0
-    }
-
-    const ratio = part / total;
-    const percentage = Math.round(ratio * 100); // Làm tròn đến số nguyên gần nhất
-    return `${percentage}%`;
 }

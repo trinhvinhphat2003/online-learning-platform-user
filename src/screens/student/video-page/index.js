@@ -37,7 +37,7 @@ export default function VideoPage() {
         if(chapter.isCompletable) {
             // setIsCompleted(!isCompleted)
             try {
-                const response = await axios.post(`${BASE_URL}/api/addCompleteChapter`, 
+                const response = await axios.post(`${BASE_URL}/api/user/addCompleteChapter`, 
                     {
                         courseData: {
                             course_id: chapter.course_id,

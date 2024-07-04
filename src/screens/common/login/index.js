@@ -3,20 +3,21 @@ import color from "../../../themes/common/color";
 const backgroundImage = require("../../../../assets/login-background.png")
 import { AntDesign } from '@expo/vector-icons';
 import googleLogo from '../../../../assets/google_logo.jpg'
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import TextInputContainer from "../../../components/text-input-container";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import axios from "axios";
 import { apiConfig } from "../../../config/api-config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BASE_URL = apiConfig.baseURL
 
 export default function LoginScreen() {
     const { setIsLogin, setUserData, userData, setSession, session, login } = useContext(AuthContext)
     const navigation = useNavigation()
-    const [email, setEmail] = useState("trinhvinhphat1234567@gmail.com")
+    const [email, setEmail] = useState("trinhvinhphat123@gmail.com")
     const [password, setPassword] = useState("1122334455")
 
     const validateInput = () => {
@@ -43,23 +44,52 @@ export default function LoginScreen() {
                 password: password,
             });
 
-            if (response.status === 200) {
+            if (response.data.success) {
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
                     text2: 'Logged in successfully!',
                 });
-                await setUserData(response.data.result.user)
-                await setSession(response.data.result.session)
-                await login()
+                //console.log(JSON.stringify(response.data, undefined, 4))
+                // await setUserData(response.data.result.user)
+                // await setSession(response.data.result.session)
+                await login(response.data.result.user, response.data.result.session)
             } else {
-                Alert.alert("Login Failed", response.data.message || "An error occurred");
+                Toast.show({
+                    type: 'error',
+                    text1: 'Login failed',
+                    text2: 'Unknow user',
+                });
             }
         } catch (error) {
             Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
             console.log(JSON.stringify(error, undefined, 4))
         }
     };
+
+    // useEffect(() => {
+    //     const checkUserSession = async () => {
+    //         const userDataAsync = await AsyncStorage.getItem('userData');
+    //         const sessionAsync = await AsyncStorage.getItem('session');
+    //         if (userData !== null && sessionAsync !== null) {
+    //           const sessionAfterParse = JSON.parse(sessionAsync);
+    //           const userDataAfterParse = JSON.parse(userDataAsync);
+    //           const currentTime = new Date().getTime();
+    //           console.log(session.time > currentTime)
+    //           if (session.time > currentTime) {
+    //             console.log("gello")
+    //             await setUserData(userDataAfterParse);
+    //             await setToken(sessionAfterParse);
+    //             await login()
+    //           }
+    //         }
+    //         console.log("Async")
+    //         console.log(JSON.stringify(JSON.parse(userDataAsync), undefined, 4))
+    //         console.log(JSON.stringify(JSON.parse(sessionAsync), undefined, 4))
+    //       };
+      
+    //       checkUserSession();
+    // }, [])
 
     // const handleLogin = async () => {
     //     console.log(`${BASE_URL}/api/auth/login`)
@@ -73,7 +103,7 @@ export default function LoginScreen() {
     //         }).catch((error) => {
     //             console.log(JSON.stringify(error, undefined, 4))
     //         })
-            
+
     //     } catch (error) {
     //         Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
     //         console.log(JSON.stringify(error, undefined, 4))

@@ -18,7 +18,7 @@ export default function DetailSection({ course, isEnrolled, setIsEnrolled, setWe
 
     const fetchFeedbackByCourseId = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/getCommentByCourseId`, {
+            const response = await axios.get(`${BASE_URL}/api/user/getCommentByCourseId`, {
                 headers: {
                     Authorization: `Bearer ${session.token}`,
                 },
@@ -66,12 +66,12 @@ export default function DetailSection({ course, isEnrolled, setIsEnrolled, setWe
     const handleEnrollCourse = async () => {
         //setIsEnrolled(!isEnrolled)
 
-        // setWebViewVisible(true);
-        // setSdkUrl(buildVNPayURL(course.price))
+        if (!isEnrolled) {
+            // setWebViewVisible(true);
+            // setSdkUrl(buildVNPayURL(course.price))
 
-        if (!course.is_trial && !isEnrolled) {
             try {
-                const response = await axios.post(`${BASE_URL}/api/addEnroll`,
+                const response = await axios.post(`${BASE_URL}/api/user/addEnroll`,
                     {
                         enrollment: {
                             course_id: course.course_id,
@@ -174,7 +174,7 @@ export default function DetailSection({ course, isEnrolled, setIsEnrolled, setWe
                         onPress={handleEnrollCourse}
                         style={{
                             padding: 20,
-                            backgroundColor: course.is_trial ? color.GREEN : (isEnrolled ? color.GREEN : color.PRIMARY),
+                            backgroundColor: isEnrolled ? color.GREEN : color.PRIMARY,
                             borderRadius: 15
                         }}>
                         <Text style={{
@@ -183,7 +183,7 @@ export default function DetailSection({ course, isEnrolled, setIsEnrolled, setWe
                             color: color.WHITE,
                             fontSize: 17
                         }}>
-                            {course.is_trial ? "Trial Course" : (isEnrolled ? "You enrolled this course" : "Buy This Course 17$")}
+                            {isEnrolled ? "You enrolled this course" : "Buy This Course: " + (course.is_trial ? "FREE" : formatCurrency(course.price))}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -191,4 +191,11 @@ export default function DetailSection({ course, isEnrolled, setIsEnrolled, setWe
 
         </View>
     )
+}
+
+function formatCurrency(amount) {
+    // Chuyển đổi số nguyên thành chuỗi và định dạng lại với dấu chấm
+    const formattedAmount = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // Thêm đơn vị tiền tệ "VND" vào cuối chuỗi
+    return `${formattedAmount} VND`;
 }

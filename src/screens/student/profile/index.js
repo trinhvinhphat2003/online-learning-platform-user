@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
-import React, { useContext, useState } from 'react'
-import { Image, ImageBackground, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { ActivityIndicator, Image, ImageBackground, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import Icon from "@expo/vector-icons/Entypo"
 import { Ionicons } from '@expo/vector-icons';
 import SettingModal from '../../../components/setting-modal';
@@ -8,14 +8,31 @@ import { AuthContext } from '../../../context/AuthContext';
 import StudentProfileCourse from '../../../components/student-profile-course';
 import color from '../../../themes/common/color';
 import { mockCourse } from '../../../mock-data-support/course';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native'
+import { apiConfig } from '../../../config/api-config';
+import axios from 'axios';
+
+const BASE_URL = apiConfig.baseURL
+
+function calculatePercentage(part, total) {
+    if (total === 0) {
+        return '0%'; // Tránh chia cho 0
+    }
+
+    const ratio = part / total;
+    const percentage = Math.round(ratio * 100); // Làm tròn đến số nguyên gần nhất
+    return `${percentage}%`;
+}
 
 export default function ProfileScreen() {
-    const [videoList, setVideoList] = useState(mockCourse)
+    const [videoList, setVideoList] = useState([])
     const navigation = useNavigation()
-    const { setIsLogin, userData } = useContext(AuthContext)
-
+    const { setIsLogin, userData, session } = useContext(AuthContext)
+    const [courseLoading, setCourseLoading] = useState(false)
     const [collectionSelected, setCollectionSelected] = useState(true)
     const [modalVisible, setModalVisible] = useState(false);
+    const [courses, setCourses] = useState([])
 
     const handleEditProfile = () => {
         // Xử lý logic khi người dùng chọn "Edit Profile"
@@ -26,9 +43,58 @@ export default function ProfileScreen() {
     const handleLogOut = () => {
         // Xử lý logic khi người dùng chọn "Log Out"
         console.log('Log Out');
+        AsyncStorage.clear()
         setModalVisible(false); // Đóng modal sau khi chọn tùy chọn
         setIsLogin(false)
     };
+
+    useEffect(() => {
+        if(collectionSelected) {
+            setCourses(videoList.filter((item) => calculatePercentage(item?.courseCompleted?.length, item?.chapters?.length) !== "100%"))
+        }
+        if(!collectionSelected) {
+            setCourses(videoList.filter((item) => calculatePercentage(item?.courseCompleted?.length, item?.chapters?.length) === "100%"))
+        }
+    }, [collectionSelected, videoList])
+
+    useFocusEffect(
+        useCallback(() => {
+            //console.log(collectionSelected)
+            const fetchData = async () => {
+                setCourseLoading(true); // Bắt đầu loading
+                try {
+                    const response = await axios.get(`${BASE_URL}/api/user/getEnroll`, {
+                        headers: {
+                            Authorization: `Bearer ${session.token}`,
+                        }
+                    });
+
+                    let standardlizedData = []
+
+                    if (response.data.success) {
+                        //console.log(JSON.stringify(response.data.enrollData, undefined, 4))
+                        for(const enrollData of response.data.enrollData) {
+                            standardlizedData.push({
+                                ...enrollData.course,
+                                chapters: enrollData.chapters,
+                                courseCompleted: enrollData.courseCompleted,
+                                isEnrolled: true
+                            })
+                        }
+                        setVideoList(standardlizedData)
+                        console.log(JSON.stringify(standardlizedData, undefined, 4))
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                } finally {
+                    setCourseLoading(false); // Kết thúc loading
+                }
+            };
+
+            fetchData();
+        }, [])
+    )
 
     onTabPressed = () => {
         setCollectionSelected(!collectionSelected)
@@ -191,32 +257,42 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
             </View>
 
-
-            <ScrollView style={{
-                display: "flex",
-                flexDirection: "column",
-                marginTop: 15,
-                marginBottom: 15,
-                paddingLeft: 3,
-                paddingRight: 3
-            }}>
-                {videoList.map((item, index) => (
-                    <StudentProfileCourse
-                        key={index}
-                        onPress={() => {
-                            navigation.navigate("CourseDetail",
-                                {
-                                    course: item
-                                }
-                            )
-                        }}
-                        img={item.image}
-                        title={item.title}
-                        bg="#fff"
-                    />
-                ))}
-
-            </ScrollView>
+            {
+                courseLoading ?
+                (
+                    <ActivityIndicator size="large" color={color.BLACK} style={{ marginTop: 20, alignSelf: "center" }} />
+                )
+                :
+                (
+                    <ScrollView style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        marginTop: 15,
+                        marginBottom: 15,
+                        paddingLeft: 3,
+                        paddingRight: 3
+                    }}>
+                        {courses.map((item, index) => (
+                            <StudentProfileCourse
+                            index={index}
+                            onPress={() => {
+                                navigation.push("CourseDetail",
+                                    {
+                                        course: item,
+                                        isInstructor: true
+                                    }
+                                )
+                            }}
+                            img={item.image_url}
+                            title={item.title}
+                            bg="#fff"
+                            course={item}
+                            />
+                        ))}
+        
+                    </ScrollView>
+                )
+            }
         </View>
     )
 }

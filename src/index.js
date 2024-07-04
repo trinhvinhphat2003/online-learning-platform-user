@@ -29,7 +29,6 @@ export default function Index() {
                     <Stack.Screen name='FeedBack' component={FeedbackScreen} />
                     <Stack.Screen name='TutorDetail' component={TutorDetailScreen} />
                 </Stack.Navigator>
-
             }
         </>
     )

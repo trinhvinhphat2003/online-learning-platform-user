@@ -101,7 +101,7 @@ export default function FeedbackItem({ feedback }) {
                     </View>
                 </View>
                 <TouchableOpacity>
-                    <SimpleLineIcons name="options-vertical" size={18} color="black" />
+                {feedback.item.user_id === userData.user_id && <SimpleLineIcons name="options-vertical" size={18} color="black" />}
                 </TouchableOpacity>
             </View>
 

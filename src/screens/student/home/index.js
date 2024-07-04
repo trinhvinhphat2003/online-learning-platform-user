@@ -1,5 +1,4 @@
-
-import { View, Image, StyleSheet, Text, ScrollView, ActivityIndicator } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, FlatList } from "react-native";
 import Header from "../../../components/Header";
 import color from "../../../themes/common/color";
 import VideoCourseList from "../../../components/video-course-list";
@@ -24,7 +23,7 @@ export default function HomeScreen() {
     const fetchTutor = async () => {
         setTutorLoading(true); // Bắt đầu loading
         try {
-            const response = await axios.get(`${BASE_URL}/api/getInstructors`, {
+            const response = await axios.get(`${BASE_URL}/api/user/getInstructors`, {
                 headers: {
                     Authorization: `Bearer ${session.token}`,
                 },
@@ -34,7 +33,6 @@ export default function HomeScreen() {
                 setTutors(response.data.instructorList)
                 console.log(JSON.stringify(response.data.instructorList, undefined, 4));
             }
-            //console.log(JSON.stringify(courses, undefined, 4));
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -47,12 +45,12 @@ export default function HomeScreen() {
             const fetchData = async () => {
                 setCourseLoading(true); // Bắt đầu loading
                 try {
-                    const response = await axios.get(`${BASE_URL}/api/getCourse`, {
+                    const response = await axios.get(`${BASE_URL}/api/user/getCourse`, {
                         headers: {
                             Authorization: `Bearer ${session.token}`,
                         },
                     });
-                    const response2 = await axios.get(`${BASE_URL}/api/getEnroll`, {
+                    const response2 = await axios.get(`${BASE_URL}/api/user/getEnroll`, {
                         headers: {
                             Authorization: `Bearer ${session.token}`,
                         }
@@ -61,8 +59,6 @@ export default function HomeScreen() {
                     let standardlizedData = []
 
                     if (response2.data.success) {
-
-                        //console.log(JSON.stringify(response.data, undefined, 4));
                         for (const courseRes of response.data.courses) {
                             let check = false;
                             for (const enroll of response2?.data?.enrollData) {
@@ -84,11 +80,9 @@ export default function HomeScreen() {
                         }
 
                         await setCourses({ data: standardlizedData, time: Date.now() })
-                        //console.log(JSON.stringify(standardlizedData, undefined, 4));
                     } else {
                         await setCourses({ data: response.data.courses, time: Date.now() })
                     }
-                    //console.log(JSON.stringify(courses, undefined, 4));
                 } catch (error) {
                     console.error("Error fetching data:", error);
                 } finally {
@@ -98,7 +92,6 @@ export default function HomeScreen() {
 
             fetchData();
             fetchTutor();
-            // console.log(JSON.stringify(userData, undefined, 4))
         }, [])
     )
 
@@ -114,11 +107,9 @@ export default function HomeScreen() {
             </View>
         )
     }
-    return (
-        <ScrollView scrollEventThrottle={16} bounces={false} style={{
-            width: "100%",
-            height: "100%"
-        }}>
+
+    const renderHeader = () => {
+        return (
             <View style={{
                 backgroundColor: color.PRIMARY,
                 width: "100%",
@@ -128,7 +119,11 @@ export default function HomeScreen() {
             }}>
                 <Header userData={userData} />
             </View>
+        );
+    }
 
+    const renderContent = () => {
+        return (
             <View style={{
                 backgroundColor: "#F5F5F5",
                 paddingTop: 0,
@@ -137,14 +132,22 @@ export default function HomeScreen() {
                 <View style={{
                     marginTop: -185
                 }}>
-                    <VideoCourseList loading={courseLoading} navigateTo={"course"} subHeadingColor={color.WHITE} isPrimary={false} title={"Trial Courses"} courses={courses.data.filter((item) => item.is_trial)} />
+                    <VideoCourseList loading={courseLoading} navigateTo={"course"} subHeadingColor={color.WHITE} isPrimary={false} title={"Trial Courses"} courses={courses?.data?.filter((item) => item.is_trial)} />
                 </View>
                 {renderLineDevider({ marginTop: 30, marginBottom: 10 })}
-                <HorizontialTutorList loading={courseLoading} navigateTo={"tutor"} subHeadingColor={color.BLACK} isPrimary={true} title={"Most Contribution Tutor"} tutors={tutors.filter((item) => item.courses?.length > 2)} />
-                <VerticalVideoList loading={courseLoading} navigateTo={"course"} subHeadingColor={color.BLACK} title={"New Courses"} isPrimary={true} courses={courses.data.filter(item => !item.is_trial).slice(0, 5)} />
+                <HorizontialTutorList loading={courseLoading} navigateTo={"tutor"} subHeadingColor={color.BLACK} isPrimary={true} title={"Most Contribution Tutor"} tutors={tutors?.sort((a, b) => b.courses?.length - a.courses?.length).slice(0, 5)} />
+                <VerticalVideoList titleStyle={{ marginBottom: 10, paddingHorizontal: 0 }} containerStyle={{ paddingHorizontal: 20 }} loading={courseLoading} navigateTo={"course"} subHeadingColor={color.BLACK} title={"New Courses"} isPrimary={true} courses={courses?.data?.filter(item => !item.is_trial).slice(0, 5)} />
             </View>
-        </ScrollView>
-    )
+        );
+    }
+
+    return (
+        <FlatList
+            data={[]}
+            ListHeaderComponent={renderHeader}
+            ListEmptyComponent={renderContent}
+        />
+    );
 }
 
 const styles = StyleSheet.create({

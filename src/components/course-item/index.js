@@ -4,6 +4,16 @@ import color from "../../themes/common/color";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function CourseItem({ item }) {
+    console.log(JSON.stringify(item, undefined, 4))
+    function calculatePercentage(part, total) {
+        if (total === 0) {
+            return '0%'; // Tránh chia cho 0
+        }
+
+        const ratio = part / total;
+        const percentage = Math.round(ratio * 100); // Làm tròn đến số nguyên gần nhất
+        return `${percentage}%`;
+    }
     return (
         <View style={{
             backgroundColor: color.WHITE,
@@ -56,7 +66,8 @@ export default function CourseItem({ item }) {
                     </View>
                 </View>
             </View>
-            {item.is_trial &&
+            {!item.isEnrolled ?
+            (
                 <View>
                     <Text style={{
                         fontFamily: "outfit-bold",
@@ -66,6 +77,31 @@ export default function CourseItem({ item }) {
                         TRIAL
                     </Text>
                 </View>
+            )
+            :
+            (
+                <View>
+                    <View style={{
+                        width: "100%",
+                        height: 10,
+                        backgroundColor: "white",
+                        borderRadius: 99,
+                        borderWidth: 3,
+                        borderColor: color.PRIMARY,
+                        marginBottom: 9,
+                        marginTop: 9
+                    }}>
+                        <View style={{
+                            width: calculatePercentage(item?.chapterCompleted?.length, item?.chapters?.length),
+                            height: "100%",
+                            backgroundColor: color.GREEN
+                        }}>
+
+                        </View>
+                    </View>
+                </View>
+            )
+                
             }
 
         </View>

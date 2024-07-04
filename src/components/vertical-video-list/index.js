@@ -11,14 +11,14 @@ import axios from "axios";
 
 const BASE_URL = apiConfig.baseURL
 
-export default function VerticalVideoList({ subHeadingColor, isPrimary, title, hiddenTitle, containerStyle, noSepLine, courses, navigateTo, scrollableStyle, loading }) {
+export default function VerticalVideoList({ subHeadingColor, isPrimary, title, hiddenTitle, containerStyle, noSepLine, courses, navigateTo, scrollableStyle, loading, titleStyle }) {
 
     const { userData, session } = useContext(AuthContext)
     const [enrolledCourses, setEnrolledCourses] = useState([])
 
     async function handleIsCourseEnrolled() {
         try {
-            const response = await axios.get(`${BASE_URL}/api/getEnroll`, {
+            const response = await axios.get(`${BASE_URL}/api/user/getEnroll`, {
                 headers: {
                     Authorization: `Bearer ${session.token}`,
                 }
@@ -62,7 +62,8 @@ export default function VerticalVideoList({ subHeadingColor, isPrimary, title, h
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                flexDirection: "row"
+                flexDirection: "row",
+                ...titleStyle
             }}>
                 <Text style={{
                     fontFamily: "outfit-bold",

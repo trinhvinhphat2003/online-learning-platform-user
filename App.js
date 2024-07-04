@@ -1,5 +1,5 @@
 
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import LoginScreen from './src/screens/common/login'
 import HomeScreen from './src/screens/student/home';
@@ -17,6 +17,10 @@ export default function App() {
     'outfit-bold': require('./assets/fonts/Outfit-Bold.ttf'),
     'outfit-medium': require('./assets/fonts/Outfit-SemiBold.ttf')
   });
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" />;
+  }
 
   return (
     <AuthProvider>

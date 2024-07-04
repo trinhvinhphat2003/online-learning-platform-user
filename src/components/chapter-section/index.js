@@ -56,9 +56,9 @@ export default function ChapterSection({ chapterList, isEnrolled, isTrial }) {
             {/* complete */}
             {chapterList.map((item, index) => {
                 return (
-                    item.isCompleted && (isEnrolled || isTrial) ?
-                        <TouchableOpacity onPress={() => {
-                            if (isEnrolled || isTrial) {
+                    item.isCompleted && isEnrolled ?
+                        <TouchableOpacity key={index} onPress={() => {
+                            if (isEnrolled) {
                                 navigation.navigate("VideoPage",
                                     {
                                         // chapter: {
@@ -72,7 +72,7 @@ export default function ChapterSection({ chapterList, isEnrolled, isTrial }) {
                                         // }
                                         chapter: {
                                             ...item,
-                                            isCompletable: isEnrolled || isTrial
+                                            isCompletable: isEnrolled
                                         }
                                     }
                                 )
@@ -100,7 +100,7 @@ export default function ChapterSection({ chapterList, isEnrolled, isTrial }) {
                         </TouchableOpacity>
                         :
                         <TouchableOpacity key={index} onPress={() => {
-                            if (isEnrolled || isTrial) {
+                            if (isEnrolled) {
                                 navigation.navigate("VideoPage",
                                     {
                                         // chapter: {
@@ -114,13 +114,13 @@ export default function ChapterSection({ chapterList, isEnrolled, isTrial }) {
                                         // }
                                         chapter: {
                                             ...item,
-                                            isCompletable: isEnrolled || isTrial
+                                            isCompletable: isEnrolled
                                         }
                                     }
                                 )
                             }
                         }}>
-                            <View key={index} style={{ ...styles.inComplete, borderColor: isEnrolled || isTrial ? "black" : "gray" }}>
+                            <View key={index} style={{ ...styles.inComplete, borderColor: isEnrolled ? "black" : "gray" }}>
                                 <View style={{
                                     display: "flex",
                                     flexDirection: "row",
@@ -130,19 +130,21 @@ export default function ChapterSection({ chapterList, isEnrolled, isTrial }) {
                                     <Text style={{
                                         fontFamily: "outfit-medium",
                                         fontSize: 27,
-                                        color: isEnrolled || isTrial ? "black" : "gray"
+                                        color: isEnrolled ? "black" : "gray"
                                     }}>
                                         {index + 1}
                                     </Text>
                                     <Text style={{
                                         fontFamily: "outfit",
                                         fontSize: 21,
-                                        color: isEnrolled || isTrial ? "black" : "gray"
-                                    }}>
+                                        color: isEnrolled ? "black" : "gray",
+                                        width: 300
+                                    }}
+                                    numberOfLines={1}>
                                         {item.title}
                                     </Text>
                                 </View>
-                                {isEnrolled || isTrial ?
+                                {isEnrolled ?
                                     <Ionicons name="play-circle" size={30} color="black" />
                                     :
                                     <Ionicons name="lock-closed" size={25} color="gray" />

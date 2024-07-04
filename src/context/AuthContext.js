@@ -15,14 +15,14 @@ export const AuthProvider = ({ children }) => {
     const checkUserSession = async () => {
       const userDataAsync = await AsyncStorage.getItem('userData');
       const sessionAsync = await AsyncStorage.getItem('session');
-      if (userData !== null && sessionAsync !== null) {
+      if (userDataAsync !== null && sessionAsync !== null) {
         const sessionAfterParse = JSON.parse(sessionAsync);
         const userDataAfterParse = JSON.parse(userDataAsync);
         const currentTime = new Date().getTime();
-        console.log(session.time > currentTime)
-        if (session.time > currentTime) {
+        console.log(sessionAfterParse.expires_at > currentTime)
+        if (sessionAfterParse.expires_at > currentTime) {
           setUserData(userDataAfterParse);
-          setToken(sessionAfterParse);
+          setSession(sessionAfterParse);
           setIsLogin(true);
         }
       }
@@ -34,15 +34,17 @@ export const AuthProvider = ({ children }) => {
     checkUserSession();
   }, []);
 
-  const login = async () => {
-    // console.log(JSON.stringify(userData, undefined, 4))
-    // console.log(JSON.stringify(session, undefined, 4))
-    await AsyncStorage.setItem('userData', JSON.stringify(userData));
-    await AsyncStorage.setItem('session', JSON.stringify(session));
-    // const userDataAsync = await AsyncStorage.getItem('userData');
-    // const sessionAsync = await AsyncStorage.getItem('session');
-    // console.log(JSON.stringify(JSON.parse(userDataAsync), undefined, 4))
-    // console.log(JSON.stringify(JSON.parse(sessionAsync), undefined, 4))
+  const login = async (userInfo, sessionInfo) => {
+    setUserData(userInfo);
+    setSession(sessionInfo)
+    console.log(JSON.stringify(userInfo, undefined, 4))
+    console.log(JSON.stringify(sessionInfo, undefined, 4))
+    await AsyncStorage.setItem('userData', JSON.stringify(userInfo));
+    await AsyncStorage.setItem('session', JSON.stringify(sessionInfo));
+    const userDataAsync = await AsyncStorage.getItem('userData');
+    const sessionAsync = await AsyncStorage.getItem('session');
+    console.log(JSON.stringify(JSON.parse(userDataAsync), undefined, 4))
+    console.log(JSON.stringify(JSON.parse(sessionAsync), undefined, 4))
     setIsLogin(true);
   };
 

@@ -21,7 +21,7 @@ export default function TutorScreen() {
     const fetchTutor = async () => {
         setTutorLoading(true); // Bắt đầu loading
         try {
-            const response = await axios.get(`${BASE_URL}/api/getInstructors`, {
+            const response = await axios.get(`${BASE_URL}/api/user/getInstructors`, {
                 headers: {
                     Authorization: `Bearer ${session.token}`,
                 },
@@ -102,9 +102,9 @@ export default function TutorScreen() {
                                     numColumns={2}
                                     data={tutors}
                                     scrollEnabled
-                                    renderItem={(item, index) => {
+                                    renderItem={(item) => {
                                         return (
-                                            <TutorCard tutor={item} key={index} />
+                                            <TutorCard tutor={item} />
                                         )
                                     }}
                                     columnWrapperStyle={{
@@ -123,6 +123,7 @@ export default function TutorScreen() {
                                         width: "100%",
                                         height: 670
                                     }}
+                                    keyExtractor={(item, index) => index.toString()}
                                 />
                             )
                     }

@@ -13,7 +13,7 @@ const TextInputContainer = (props) => {
             </View>
             <View>
                 <Text style={styles.title}>{name}</Text>
-                <TextInput onChangeText={(text) => setValue(text)} value={value} style={styles.input} placeholder={placeholder} />
+                <TextInput secureTextEntry={name === "Password" ? true : false} onChangeText={(text) => setValue(text)} value={value} style={styles.input} placeholder={placeholder} />
             </View>
         </View>
     )

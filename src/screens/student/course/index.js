@@ -21,7 +21,7 @@ export default function CourseScreen() {
     const fetchData = async () => {
         setLoading(true); // Bắt đầu loading
         try {
-            const response = await axios.get(`${BASE_URL}/api/getCourse`, {
+            const response = await axios.get(`${BASE_URL}/api/user/getCourse`, {
                 headers: {
                     Authorization: `Bearer ${session.token}`,
                 },
@@ -33,7 +33,7 @@ export default function CourseScreen() {
             // await setCourses({data: [], time: Date.now()})
             // await setCourses({data: response.data.courses, time: Date.now()})
 
-            const response2 = await axios.get(`${BASE_URL}/api/getEnroll`, {
+            const response2 = await axios.get(`${BASE_URL}/api/user/getEnroll`, {
                 headers: {
                     Authorization: `Bearer ${session.token}`,
                 }
@@ -43,7 +43,7 @@ export default function CourseScreen() {
 
             if(response2.data.success && response.data.success) {
                 //console.log(JSON.stringify(response.data, undefined, 4));
-                const courseToHandle = response.data.courses.filter((item) => !item.is_trial)
+                const courseToHandle = response.data.courses;
                 console.log(JSON.stringify(courseToHandle, undefined, 4));
                 for(const courseRes of courseToHandle) {
                     let check = false;
@@ -159,15 +159,15 @@ export default function CourseScreen() {
 
                         <TouchableOpacity 
                             onPress={async () => {
-                                if(category === "intermidiate") {
+                                if(category === "intermediate") {
                                     await setCategory("")
                                 } else {
-                                    await setCategory("intermidiate")
+                                    await setCategory("intermediate")
                                 }
                             }}
                         style={{
                             padding: 10,
-                            backgroundColor: category === "intermidiate" ? "white" : "gray",
+                            backgroundColor: category === "intermediate" ? "white" : "gray",
                             color: "black",
                             borderRadius: 10,
                             flex: 1.5
@@ -177,7 +177,7 @@ export default function CourseScreen() {
                                 fontSize: 20,
                                 textAlign: "center"
                             }}>
-                                Intermidiate
+                                Intermediate
                             </Text>
                         </TouchableOpacity>
 

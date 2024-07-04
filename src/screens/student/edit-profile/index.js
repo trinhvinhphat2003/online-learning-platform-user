@@ -16,24 +16,105 @@ import { useNavigation } from '@react-navigation/native';
 import color from "../../../themes/common/color";
 import TopBackSection from "../../../components/top-back-section";
 import { AuthContext } from "../../../context/AuthContext";
+import axios from "axios";
+import { apiConfig } from "../../../config/api-config";
+import Toast from "react-native-toast-message";
+
+const BASE_URL = apiConfig.baseURL
 
 export default function EditProfile() {
-  const { userData } = useContext(AuthContext)
+  const { userData, session, setUserData } = useContext(AuthContext)
   const navigation = useNavigation()
   const [selectedImage, setSelectedImage] = useState(userData.image_url);
   const [name, setName] = useState(userData.user_name);
   const [email, setEmail] = useState(userData.email);
   const [password, setPassword] = useState("randompassword");
-  const [country, setCountry] = useState("Nigeria");
+  const [imageDetail, setImageDetail] = useState(null)
+  //const [country, setCountry] = useState("Nigeria");
 
   const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
   const today = new Date();
   const startDate = getFormatedDate(
-    today.setDate(today.getDate() + 1),
-    "YYYY/MM/DD"
+    today.setDate(new Date(userData.date_of_birth)),
+    "YYYY-MM-DD"
   );
-  const [selectedStartDate, setSelectedStartDate] = useState("01/01/1990");
-  const [startedDate, setStartedDate] = useState("12/12/2023");
+  const [selectedStartDate, setSelectedStartDate] = useState(userData.date_of_birth ? userData.date_of_birth : "2023-12-12");
+  const [startedDate, setStartedDate] = useState(userData.date_of_birth);
+
+  const handleSaveChange = async () => {
+    const updateData = {
+      user_name: name,
+      email: email,
+      date_of_birth: selectedStartDate,
+      image_url: userData.image_url
+    }
+
+    if (imageDetail !== null) {
+      const localUri = imageDetail.assets[0].uri;
+      const filename = imageDetail.assets[0].fileName || localUri.split('/').pop();
+      const type = imageDetail.assets[0].mimeType || 'image/jpeg';
+
+      const fileData = { uri: localUri, name: filename, type }
+
+      const formData = new FormData();
+      formData.append('file', fileData);
+      console.log(JSON.stringify(fileData, undefined, 4))
+
+      const baseImageUrl = "https://1st-store.uk/files/";
+
+      try {
+        const response = await axios.post('https://1st-store.uk/files/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        const data = response.data;
+        console.log(JSON.stringify(data, undefined, 4))
+        if(data.success) {
+          updateData.image_url=baseImageUrl + data.filename
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    }
+
+    try {
+      const response = await axios.put(`${BASE_URL}/api/user/updateCustomerProfile`, 
+        {
+          userData: updateData
+        },
+        {
+          headers: {
+              Authorization: `Bearer ${session.token}`,
+          },
+      });
+
+      console.log(JSON.stringify(response.data, undefined, 4))
+
+      if (response.data.success) {
+        setUserData({
+          ...userData,
+          user_name: updateData.user_name,
+          image_url: updateData.image_url,
+          date_of_birth: updateData.date_of_birth
+        })
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Edit profile successfully!',
+      });
+      }
+  } catch (error) {
+      console.error("Error fetching data:", error);
+  }
+
+
+
+    // console.log(JSON.stringify(updateData, undefined, 4))
+    // console.log(JSON.stringify(imageDetail, undefined, 4))
+
+  }
 
   const handleChangeStartDate = (propDate) => {
     setStartedDate(propDate);
@@ -51,7 +132,9 @@ export default function EditProfile() {
       quality: 1,
     });
 
-    console.log(result);
+    setImageDetail(result);
+
+    //console.log(result);
 
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
@@ -93,10 +176,11 @@ export default function EditProfile() {
           >
             <DatePicker
               mode="calendar"
+              current={selectedStartDate.replace(/-/g, '/')}
               minimumDate={startDate}
-              selected={startedDate}
+              selected={selectedStartDate.replace(/-/g, '/')}
               onDateChanged={handleChangeStartDate}
-              onSelectedChange={(date) => setSelectedStartDate(date)}
+              onSelectedChange={(date) => setSelectedStartDate(date.replace(/\//g, '-'))}
               options={{
                 backgroundColor: color.PRIMARY,
                 textHeaderColor: "#469ab6",
@@ -182,6 +266,7 @@ export default function EditProfile() {
                 value={name}
                 onChangeText={(value) => setName(value)}
                 editable={true}
+                style={{ fontFamily: "outfit-medium" }}
               />
             </View>
           </View>
@@ -208,7 +293,8 @@ export default function EditProfile() {
               <TextInput
                 value={email}
                 onChangeText={(value) => setEmail(value)}
-                editable={true}
+                editable={false}
+                style={{ fontFamily: "outfit-medium" }}
               />
             </View>
           </View>
@@ -235,8 +321,9 @@ export default function EditProfile() {
               <TextInput
                 value={password}
                 onChangeText={(value) => setPassword(value)}
-                editable={true}
+                editable={false}
                 secureTextEntry
+                style={{ fontFamily: "outfit-medium" }}
               />
             </View>
           </View>
@@ -261,12 +348,12 @@ export default function EditProfile() {
                 paddingLeft: 8,
               }}
             >
-              <Text>{selectedStartDate}</Text>
+              <Text style={{ fontFamily: "outfit-medium" }}>{selectedStartDate}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <View
+        {/* <View
           style={{
             flexDirection: "column",
             marginBottom: 6,
@@ -291,7 +378,7 @@ export default function EditProfile() {
               editable={true}
             />
           </View>
-        </View>
+        </View> */}
 
         <TouchableOpacity
           style={{
@@ -302,6 +389,7 @@ export default function EditProfile() {
             justifyContent: "center",
             marginTop: 45
           }}
+          onPress={handleSaveChange}
         >
           <Text
             style={{

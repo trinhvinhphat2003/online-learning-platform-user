@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import color from '../../themes/common/color'
 import { useNavigation } from '@react-navigation/native'
 import { mockFeedback } from '../../mock-data-support/feedback'
+import { AuthContext } from '../../context/AuthContext'
 
 export default function FeedbackSection({courseId, isEnrolled, isTrial}) {
+    const { userData, session } = useContext(AuthContext)
     const navigation = useNavigation()
     return (
         <TouchableOpacity onPress={() => {
@@ -38,7 +40,7 @@ export default function FeedbackSection({courseId, isEnrolled, isTrial}) {
                             flexDirection: "column"
                         }}>
                             <Image
-                                source={{ uri: "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg" }}
+                                source={{ uri: userData.image_url }}
                                 style={{
                                     height: 50,
                                     width: 50,
