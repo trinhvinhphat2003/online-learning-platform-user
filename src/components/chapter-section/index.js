@@ -89,9 +89,12 @@ export default function ChapterSection({ chapterList, isEnrolled, isTrial }) {
                                     <Text style={{
                                         fontFamily: "outfit",
                                         fontSize: 21,
-                                        color: color.GREEN
-                                    }}>
-                                        {"item.title"}
+                                        color: color.GREEN,
+                                        width: 280
+                                    }}
+                                    numberOfLines={1}
+                                    >
+                                        {item.title}
                                     </Text>
                                 </View>
                                 <Ionicons name="play-circle" size={30} color={color.GREEN} />

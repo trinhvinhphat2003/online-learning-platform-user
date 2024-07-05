@@ -62,7 +62,12 @@ export default function CourseDetailScreen() {
                 console.log(JSON.stringify(error, undefined, 4))
             }
         } else if (url.includes('vnp_TransactionStatus=02')) {
-            Alert.alert("Cancel transaction", "You have cancel transaction");
+            Toast.show({
+                type: 'info',
+                text1: 'Cancel transaction',
+                text2: 'You have cancel transaction!',
+            });
+            // Alert.alert("Cancel transaction", "You have cancel transaction");
             console.log('Transaction Cancel');
             setWebViewVisible(false);
         }
@@ -152,9 +157,14 @@ export default function CourseDetailScreen() {
     useEffect(() => {
         const backAction = () => {
             //ToastAndroid.show('Quay lại từ SDK thành công', ToastAndroid.SHORT);
-            Alert.alert("Cancel transaction", "You have cancel transaction");
             if (webViewVisible) {
                 setWebViewVisible(false);
+                Toast.show({
+                    type: 'info',
+                    text1: 'Cancel transaction',
+                    text2: 'You have cancel transaction!',
+                });
+                //Alert.alert("Cancel transaction", "You have cancel transaction");
                 return true; // prevent default behavior (exit the app)
             }
             return false; // let the default behavior happen

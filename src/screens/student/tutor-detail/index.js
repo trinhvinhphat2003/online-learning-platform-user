@@ -264,6 +264,7 @@ export default function TutorDetailScreen() {
                         {courses.map((item, index) => (
                             <TutorProfileCourse
                                 index={index}
+                                key={index}
                                 onPress={() => {
                                     navigation.push("CourseDetail",
                                         {

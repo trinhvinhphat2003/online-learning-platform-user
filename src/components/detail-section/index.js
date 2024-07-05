@@ -67,32 +67,34 @@ export default function DetailSection({ course, isEnrolled, setIsEnrolled, setWe
         //setIsEnrolled(!isEnrolled)
 
         if (!isEnrolled) {
-            // setWebViewVisible(true);
-            // setSdkUrl(buildVNPayURL(course.price))
-
-            try {
-                const response = await axios.post(`${BASE_URL}/api/user/addEnroll`,
-                    {
-                        enrollment: {
-                            course_id: course.course_id,
-                            enrolled_at: Date.now(),
-                            price: course.price,
-                            instructor_id: course.instructor_id
+            if (course.is_trial) {
+                try {
+                    const response = await axios.post(`${BASE_URL}/api/user/addEnroll`,
+                        {
+                            enrollment: {
+                                course_id: course.course_id,
+                                enrolled_at: Date.now(),
+                                price: course.price,
+                                instructor_id: course.instructor_id
+                            }
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${session.token}`,
+                            }
                         }
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${session.token}`,
-                        }
+                    );
+                    if (response.data.success) {
+                        setIsEnrolled(!isEnrolled)
+                        console.log(JSON.stringify(response.data, undefined, 4))
                     }
-                );
-                if (response.data.success) {
-                    setIsEnrolled(!isEnrolled)
-                    console.log(JSON.stringify(response.data, undefined, 4))
+                } catch (error) {
+                    Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
+                    console.log(JSON.stringify(error, undefined, 4))
                 }
-            } catch (error) {
-                Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
-                console.log(JSON.stringify(error, undefined, 4))
+            } else {
+                setWebViewVisible(true);
+                setSdkUrl(buildVNPayURL(course.price))
             }
         }
     }

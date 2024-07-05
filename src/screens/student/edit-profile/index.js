@@ -325,7 +325,7 @@ export default function EditProfile() {
               }}
             >
               <TextInput
-                value={password}
+                value={"1234567890"}
                 onChangeText={(value) => setPassword(value)}
                 editable={false}
                 secureTextEntry

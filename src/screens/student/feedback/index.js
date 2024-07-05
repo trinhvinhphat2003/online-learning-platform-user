@@ -21,7 +21,7 @@ export default function FeedbackScreen() {
     const [rate, setRating] = useState(3);
     const [disableFeedback, setDisableFeedback] = useState(false)
 
-    console.log(params.isEnrolled)
+    //console.log(params.isEnrolled)
 
     const handleCommentSubmit = async () => {
         try {
@@ -69,7 +69,7 @@ export default function FeedbackScreen() {
                 }
             }
             setFeedbacks(feedbacks.reverse())
-            console.log(JSON.stringify(response.data, undefined, 4))
+            //console.log(JSON.stringify(response.data, undefined, 4))
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -101,7 +101,7 @@ export default function FeedbackScreen() {
                             data={feedbacks}
                             renderItem={(item) => {
                                 return (
-                                    <FeedbackItem feedback={item} />
+                                    <FeedbackItem feedback={item} fetchFeedbackByCourseId={fetchFeedbackByCourseId}/>
                                 )
                             }}
                             keyExtractor={(item, index) => index.toString()}
@@ -233,7 +233,7 @@ export default function FeedbackScreen() {
     )
 }
 
-const StarRating = ({ rating, setRating }) => {
+export const StarRating = ({ rating, setRating }) => {
     return (
         <View style={{ flexDirection: 'row', justifyContent: 'center', paddingVertical: 10, backgroundColor: color.PRIMARY }}>
             {[1, 2, 3, 4, 5].map((star) => (

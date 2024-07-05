@@ -33,6 +33,11 @@ export default function ProfileScreen() {
     const [collectionSelected, setCollectionSelected] = useState(true)
     const [modalVisible, setModalVisible] = useState(false);
     const [courses, setCourses] = useState([])
+    const [courseProfileInfo, setCourseProfileInfo] = useState({
+        total: 0,
+        inProgress: 0,
+        completed: 0
+    })
 
     const handleEditProfile = () => {
         // Xử lý logic khi người dùng chọn "Edit Profile"
@@ -78,10 +83,17 @@ export default function ProfileScreen() {
                                 ...enrollData.course,
                                 chapters: enrollData.chapters,
                                 courseCompleted: enrollData.courseCompleted,
+                                instructor: enrollData.instructor[0],
                                 isEnrolled: true
                             })
                         }
                         setVideoList(standardlizedData)
+                        setCourseProfileInfo({
+                            ...courseProfileInfo,
+                            total: standardlizedData.length,
+                            inProgress: standardlizedData.filter((item) => calculatePercentage(item?.courseCompleted?.length, item?.chapters?.length) !== "100%").length,
+                            completed: standardlizedData.filter((item) => calculatePercentage(item?.courseCompleted?.length, item?.chapters?.length) === "100%").length
+                        })
                         console.log(JSON.stringify(standardlizedData, undefined, 4))
                     }
 
@@ -173,7 +185,7 @@ export default function ProfileScreen() {
                             fontSize: 15,
                             color: "#044244",
                             alignSelf: "center"
-                        }}>280</Text>
+                        }}>{courseProfileInfo.inProgress}</Text>
                         <Text style={{
                             fontFamily: "outfit-medium",
                             fontSize: 16,
@@ -190,7 +202,7 @@ export default function ProfileScreen() {
                             fontSize: 15,
                             color: "#044244",
                             alignSelf: "center"
-                        }}>2,107</Text>
+                        }}>{courseProfileInfo.total}</Text>
                         <Text style={{
                             fontFamily: "outfit-medium",
                             fontSize: 16,
@@ -208,7 +220,7 @@ export default function ProfileScreen() {
                             fontSize: 15,
                             color: "#044244",
                             alignSelf: "center"
-                        }}>104</Text>
+                        }}>{courseProfileInfo.completed}</Text>
                         <Text style={{
                             fontFamily: "outfit-medium",
                             fontSize: 16,
@@ -280,7 +292,7 @@ export default function ProfileScreen() {
                                 navigation.push("CourseDetail",
                                     {
                                         course: item,
-                                        isInstructor: true
+                                        // isInstructor: true
                                     }
                                 )
                             }}

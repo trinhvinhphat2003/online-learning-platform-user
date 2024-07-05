@@ -1,14 +1,71 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from 'react-native';
 import color from '../../themes/common/color';
 import { Entypo } from '@expo/vector-icons';
+import { apiConfig } from '../../config/api-config';
+import { AuthContext } from '../../context/AuthContext';
+import axios from 'axios';
+import { Alert } from 'react-native';
+import Toast from 'react-native-toast-message';
+
+const BASE_URL = apiConfig.baseURL
 
 const ChangePasswordModal = ({ visible, onClose }) => {
 
-    const [oldPass, setOldPass] = useState("fdfs");
-    const [newPass, setNewPass] = useState("sfdsf");
+    const [oldPass, setOldPass] = useState("1122334455");
+    const [newPass, setNewPass] = useState("1122334466");
     const [isHideOldPass, setIsHideOldPass] = useState(false)
     const [isHideNewPass, setIsHideNewPass] = useState(false)
+    const { userData, session } = useContext(AuthContext)
+    const [changePassLoading, setChangePassLoading] = useState(false)
+
+    const handleChangePass = async () => {
+        setChangePassLoading(true); // Bắt đầu loading
+        try {
+            const response = await axios.put(`${BASE_URL}/api/user/changePassword`,
+                {
+                    oldPassword: oldPass,
+                    password: newPass
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${session.token}`,
+                    },
+                });
+
+            if (response.data.success) {
+                console.log(JSON.stringify(response.data, undefined, 4));
+                onClose()
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success',
+                    text2: 'Change Password successfully!',
+                });
+            } else {
+                console.log(JSON.stringify(response.data, undefined, 4));
+                Alert.alert("Error", response.data.message);
+            }
+        } catch (error) {
+            const response = error.response?.data
+            if(response) {
+                let errStr = ""
+                for(const error of response.errors) {
+                    if(error.path[1] === "oldPassword") {
+                        errStr += "Old Password: ";
+                        errStr += error.message;
+                    } else {
+                        errStr += "New Password: ";
+                        errStr += error.message;
+                    }
+                    errStr += "\n"
+                }
+                Alert.alert("Error", errStr);
+            }
+            console.error("Error fetching data:", JSON.stringify(error.response.data, undefined, 4));
+        } finally {
+            setChangePassLoading(false); // Kết thúc loading
+        }
+    }
 
     return (
         <Modal
@@ -95,6 +152,28 @@ const ChangePasswordModal = ({ visible, onClose }) => {
                             </TouchableOpacity>
                         </View>
                     </View>
+
+                    <TouchableOpacity style={{
+                        paddingVertical: 15,
+                        marginTop: 10,
+                        backgroundColor: color.PRIMARY,
+                        borderRadius: 5,
+                    }} onPress={handleChangePass}>  
+                        {
+                            changePassLoading ?
+                            (
+                                <ActivityIndicator size="large" color={color.BLACK} style={{ marginTop: 20, alignSelf: "center" }} />
+                            )
+                            :
+                            (
+                                <Text style={{
+                                    fontSize: 18,
+                                    textAlign: 'center',
+                                    color: 'white',
+                                }}>Change Password</Text>
+                            )
+                        }
+                    </TouchableOpacity>
 
                     <TouchableOpacity style={styles.cancelButton} onPress={() => {
                         setOldPass("")

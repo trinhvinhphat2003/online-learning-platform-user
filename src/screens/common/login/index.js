@@ -11,6 +11,7 @@ import Toast from "react-native-toast-message";
 import axios from "axios";
 import { apiConfig } from "../../../config/api-config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ResetPasswordModal from "../../../components/reset-password-modal";
 
 const BASE_URL = apiConfig.baseURL
 
@@ -19,6 +20,7 @@ export default function LoginScreen() {
     const navigation = useNavigation()
     const [email, setEmail] = useState("trinhvinhphat123@gmail.com")
     const [password, setPassword] = useState("1122334455")
+    const [modalVisible, setModalVisible] = useState(false);
 
     const validateInput = () => {
         if (!email || !password) {
@@ -87,7 +89,7 @@ export default function LoginScreen() {
     //         console.log(JSON.stringify(JSON.parse(userDataAsync), undefined, 4))
     //         console.log(JSON.stringify(JSON.parse(sessionAsync), undefined, 4))
     //       };
-      
+
     //       checkUserSession();
     // }, [])
 
@@ -181,7 +183,7 @@ export default function LoginScreen() {
                     navigation.navigate("Signup")
                 }} style={{
                     alignSelf: "center",
-                    marginTop: 40
+                    marginTop: 10
                 }}>
                     <View style={{
                         padding: 10,
@@ -222,6 +224,47 @@ export default function LoginScreen() {
 
                     </View>
                 </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    setModalVisible(true)
+                }} style={{
+                    alignSelf: "center",
+                    marginTop: 0
+                }}>
+                    <View style={{
+                        padding: 10,
+                        backgroundColor: color.WHITE,
+                        borderRadius: 15,
+                        marginTop: 20,
+                        width: 250
+                    }}>
+                        <View style={{
+                            flexDirection: "row",
+                            marginHorizontal: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-around"
+                        }}>
+                            <View style={{ marginHorizontal: 0 }}>
+                                <Text placeholder="Feedback Here" disable style={{
+                                    fontSize: 18,
+                                    fontFamily: "outfit",
+                                    color: color.PRIMARY
+                                }} >
+                                    Reset Password
+                                </Text>
+                            </View>
+                            <ResetPasswordModal
+                                visible={modalVisible}
+                                onClose={() => setModalVisible(false)}
+                            // onEditProfile={handleEditProfile}
+                            // onLogOut={handleLogOut}
+                            />
+                        </View>
+
+                    </View>
+                </TouchableOpacity>
+
             </View>
         </View>
     )
